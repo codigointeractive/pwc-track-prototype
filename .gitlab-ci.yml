@@ -1,0 +1,46 @@
+variables:
+    DOCKER_REGISTRY: "gitlab.effectiveinc.com:4567"
+    DOCKER_IMAGE: "pwc/track-proto"
+    RANCHER_STACK: "pwc-track-proto"
+    RANCHER_SERVICE: "web"
+
+stages:
+    - build
+    - publish
+    - deploy
+
+build:
+  stage: build
+  script:
+    - if [ -z ${CI_COMMIT_TAG+x} ]; then docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME .; else docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE:$CI_COMMIT_TAG -t $DOCKER_REGISTRY/$DOCKER_IMAGE:latest .; fi
+
+publish:
+  stage: publish
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $DOCKER_REGISTRY
+    - if [ -z ${CI_COMMIT_TAG+x} ]; then docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:$CI_COMMIT_REF_NAME; else docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:$CI_COMMIT_TAG && docker push $DOCKER_REGISTRY/$DOCKER_IMAGE:latest; fi
+  only:
+    - /v\d+.\d+.\d+/
+    - master
+    - develop
+
+deploy:
+  stage: deploy
+  image: mpfmedical/rancher-compose
+  script:
+    - rancher-compose -f docker-compose.$CI_BUILD_REF_NAME.yml --debug --project-name $RANCHER_STACK-$CI_BUILD_REF_NAME up -d --pull --force-upgrade --confirm-upgrade
+  environment:
+    name: $CI_COMMIT_REF_NAME
+  only:
+    - develop
+    - master
+
+deploy production:
+  stage: deploy
+  image: mpfmedical/rancher-compose
+  script:
+    - rancher-compose -f docker-compose.production.yml --debug --project-name $RANCHER_STACK-production up -d --pull --force-upgrade --confirm-upgrade
+  environment:
+    name: production
+  only:
+    - /v\d+.\d+.\d+/

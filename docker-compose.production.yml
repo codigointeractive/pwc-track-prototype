@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    image: gitlab.effectiveinc.com:4567/pwc/track-proto:latest
+    command: ./node_modules/.bin/gulp serve
+    environment:
+      - NODE_ENV=development
+    labels:
+      rap.host: "pwc.track-proto.effective.net"
+      rap.port: "3000"

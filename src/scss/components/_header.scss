@@ -1,0 +1,75 @@
+/*------------------------------------*\
+  #HEADER
+\*------------------------------------*/
+
+.header {
+  align-items: center;
+  background-color: $white;
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+
+  &__logo {
+    background-color: $gray-4;
+  }
+
+  &__image {
+    display: block;
+    padding: 1rem 1.2rem;
+  }
+
+  &__title {
+    color: $gray-6;
+    font-family: $font-family-georgia;
+    font-size: 1rem;
+    font-style: italic;
+    font-weight: bold;
+    margin-left: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  &__profile {
+    display: none;
+    margin-left: auto;
+    margin-right: 1.5rem;
+
+    @media (min-width: 992px) {
+      display: block;
+    }
+
+  }
+
+  &__menu {
+    background-color: $gray-2;
+    display: inline-block;
+    height: 2px;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    width: 20px;
+
+    @media (min-width: 992px) {
+      display: none;
+    }
+
+    &::before,
+    &::after {
+      background-color: inherit;
+      content: '';
+      height: 100%;
+      left: 0;
+      position: absolute;
+      width: 100%;
+    }
+
+    &::before {
+      bottom: 6px;
+    }
+
+    &::after {
+      top: 6px;
+    }
+
+  }
+
+}
